@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Quiz — Kelas X AKL | SMK Negeri 1 Maluku Tengah</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --surface2: #1a2440;
+    --border: #1e3a5f;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --correct: #10b981;
+    --wrong: #ef4444;
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Sora',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:'';
+    position:fixed;top:0;left:0;right:0;bottom:0;
+    background:
+      radial-gradient(ellipse 80% 50% at 10% 20%, rgba(124,58,237,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 80%, rgba(0,212,255,0.10) 0%, transparent 60%);
+    pointer-events:none;z-index:0;
+  }
+
+  /* ── HEADER ── */
+  .header{
+    position:relative;z-index:10;
+    padding:32px 24px 24px;
+    border-bottom:1px solid var(--border);
+    background:rgba(17,24,39,0.85);
+    backdrop-filter:blur(12px);
+  }
+  .header-inner{max-width:860px;margin:0 auto;}
+  .school-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(0,212,255,0.08);
+    border:1px solid rgba(0,212,255,0.25);
+    border-radius:99px;padding:4px 14px;
+    font-size:11px;font-weight:600;letter-spacing:.08em;
+    color:var(--accent);text-transform:uppercase;margin-bottom:16px;
+  }
+  .header h1{font-size:clamp(22px,4vw,34px);font-weight:800;line-height:1.2;margin-bottom:6px;}
+  .header h1 span{color:var(--accent);}
+  .header-meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;}
+  .meta-chip{
+    display:flex;align-items:center;gap:6px;
+    font-size:12px;color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .meta-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar-wrap{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,15,30,0.92);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+    padding:12px 24px;
+  }
+  .progress-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:16px;}
+  .progress-label{font-size:12px;color:var(--muted);white-space:nowrap;font-family:'JetBrains Mono',monospace;}
+  .progress-track{
+    flex:1;height:6px;background:var(--surface2);
+    border-radius:99px;overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));
+    border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);
+    width:0%;
+    box-shadow:0 0 12px rgba(0,212,255,0.5);
+  }
+  .score-counter{
+    font-size:13px;font-weight:700;color:var(--accent);
+    font-family:'JetBrains Mono',monospace;white-space:nowrap;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .main{max-width:860px;margin:0 auto;padding:32px 20px 80px;position:relative;z-index:1;}
+
+  /* ── SECTION HEADER ── */
+  .section-header{
+    display:flex;align-items:center;gap:12px;
+    margin:40px 0 20px;padding:14px 20px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-left:4px solid var(--accent);
+    border-radius:0 12px 12px 0;
+  }
+  .section-header .section-icon{font-size:22px;}
+  .section-header h2{font-size:15px;font-weight:700;color:var(--accent);}
+  .section-header p{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  /* ── QUESTION CARD ── */
+  .question-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:26px 26px 20px;
+    margin-bottom:20px;
+    transition:border-color .3s, box-shadow .3s;
+    position:relative;overflow:hidden;
+  }
+  .question-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--accent2),var(--accent));
+    opacity:0;transition:opacity .3s;
+  }
+  .question-card.answered::before{opacity:1;}
+  .question-card.correct-card{border-color:var(--correct);box-shadow:0 0 0 1px rgba(16,185,129,0.2);}
+  .question-card.wrong-card{border-color:var(--wrong);box-shadow:0 0 0 1px rgba(239,68,68,0.2);}
+
+  .q-number{
+    display:inline-block;
+    font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--accent2);margin-bottom:10px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .q-context{
+    background:rgba(0,212,255,0.06);
+    border-left:3px solid var(--accent);
+    border-radius:0 8px 8px 0;
+    padding:12px 16px;margin-bottom:14px;
+    font-size:13px;line-height:1.7;color:var(--text);
+    font-style:italic;
+  }
+  .q-context .ctx-label{
+    font-size:10px;font-weight:700;letter-spacing:.1em;
+    color:var(--accent);text-transform:uppercase;
+    font-style:normal;display:block;margin-bottom:4px;
+  }
+  .q-stem{font-size:15px;font-weight:600;line-height:1.6;margin-bottom:18px;color:var(--text);}
+  .q-stem strong{color:var(--accent);}
+
+  /* ── OPTIONS ── */
+  .options{display:flex;flex-direction:column;gap:8px;}
+  .option{
+    display:flex;align-items:flex-start;gap:12px;
+    padding:12px 16px;
+    background:rgba(255,255,255,0.03);
+    border:1.5px solid rgba(255,255,255,0.07);
+    border-radius:10px;cursor:pointer;
+    transition:all .2s cubic-bezier(.4,0,.2,1);
+    text-align:left;font-size:14px;line-height:1.55;color:var(--text);
+    font-family:'Sora',sans-serif;
+    width:100%;user-select:none;
+  }
+  .option:hover:not(.disabled){
+    border-color:var(--accent);
+    background:rgba(0,212,255,0.07);
+    transform:translateX(4px);
+  }
+  .option.disabled{cursor:default;transform:none;}
+  .option-letter{
+    flex-shrink:0;width:26px;height:26px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--surface2);
+    border-radius:6px;font-size:12px;font-weight:700;
+    color:var(--muted);font-family:'JetBrains Mono',monospace;
+    transition:all .2s;
+  }
+  .option.selected .option-letter{background:var(--accent2);color:#fff;}
+  .option.correct-opt{background:rgba(16,185,129,0.12);border-color:var(--correct);}
+  .option.correct-opt .option-letter{background:var(--correct);color:#fff;}
+  .option.wrong-opt{background:rgba(239,68,68,0.10);border-color:var(--wrong);}
+  .option.wrong-opt .option-letter{background:var(--wrong);color:#fff;}
+
+  /* ── FEEDBACK BOX ── */
+  .feedback{
+    margin-top:14px;padding:14px 16px;
+    border-radius:10px;font-size:13px;line-height:1.65;
+    display:none;
+  }
+  .feedback.show{display:block;animation:fadeUp .3s ease;}
+  .feedback.correct-fb{
+    background:rgba(16,185,129,0.1);
+    border:1px solid rgba(16,185,129,0.3);
+  }
+  .feedback.wrong-fb{
+    background:rgba(239,68,68,0.08);
+    border:1px solid rgba(239,68,68,0.25);
+  }
+  .feedback-title{font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;font-size:13px;}
+  .feedback.correct-fb .feedback-title{color:var(--correct);}
+  .feedback.wrong-fb .feedback-title{color:var(--wrong);}
+  .feedback-body{color:var(--text);opacity:.9;}
+  .feedback-body strong{color:var(--accent);}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ── RESULT PANEL ── */
+  #result-panel{
+    display:none;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;padding:40px 32px;
+    margin-top:40px;text-align:center;
+    position:relative;overflow:hidden;
+  }
+  #result-panel::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(0,212,255,0.08),transparent);
+    pointer-events:none;
+  }
+  .result-emoji{font-size:60px;margin-bottom:16px;}
+  .result-score-big{
+    font-size:clamp(48px,10vw,80px);font-weight:800;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;line-height:1;
+  }
+  .result-label{font-size:16px;color:var(--muted);margin:8px 0 24px;}
+  .result-grade{
+    display:inline-block;padding:8px 24px;
+    background:linear-gradient(135deg,var(--accent2),var(--accent));
+    border-radius:99px;font-size:18px;font-weight:700;color:#fff;
+    margin-bottom:24px;
+  }
+  .result-message{font-size:14px;line-height:1.7;color:var(--muted);max-width:480px;margin:0 auto 28px;}
+  .btn-restart{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:14px 32px;
+    background:linear-gradient(135deg,var(--accent2),var(--accent));
+    border:none;border-radius:12px;color:#fff;
+    font-size:15px;font-weight:700;cursor:pointer;
+    font-family:'Sora',sans-serif;
+    transition:transform .2s,box-shadow .2s;
+    box-shadow:0 4px 20px rgba(0,212,255,0.3);
+  }
+  .btn-restart:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,212,255,0.45);}
+
+  /* ── SUBMIT BTN ── */
+  .submit-wrap{text-align:center;margin-top:32px;}
+  .btn-submit{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:16px 40px;
+    background:linear-gradient(135deg,var(--accent2),var(--accent));
+    border:none;border-radius:14px;color:#fff;
+    font-size:16px;font-weight:700;cursor:pointer;
+    font-family:'Sora',sans-serif;
+    transition:all .3s;
+    box-shadow:0 4px 24px rgba(0,212,255,0.35);
+  }
+  .btn-submit:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,212,255,0.5);}
+  .btn-submit:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* ── FLOATING SCORE ── */
+  .floating-toast{
+    position:fixed;bottom:24px;right:24px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:14px;padding:12px 20px;
+    display:flex;align-items:center;gap:10px;
+    font-size:13px;font-weight:600;
+    z-index:100;
+    transform:translateY(100px);opacity:0;
+    transition:all .4s cubic-bezier(.4,0,.2,1);
+    backdrop-filter:blur(10px);
+  }
+  .floating-toast.show{transform:translateY(0);opacity:1;}
+  .toast-correct{border-color:var(--correct);color:var(--correct);}
+  .toast-wrong{border-color:var(--wrong);color:var(--wrong);}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:600px){
+    .header{padding:20px 16px 16px;}
+    .main{padding:20px 12px 60px;}
+    .question-card{padding:18px 16px 14px;}
+    .q-stem{font-size:14px;}
+    .option{font-size:13px;}
+    #result-panel{padding:28px 20px;}
+    .header-meta{gap:12px;}
+  }
+
+  /* ── TABLE STYLE ── */
+  .q-table{
+    width:100%;border-collapse:collapse;
+    font-size:12px;margin-bottom:14px;
+    background:rgba(0,0,0,0.2);border-radius:8px;overflow:hidden;
+  }
+  .q-table th{
+    background:rgba(0,212,255,0.1);
+    padding:8px 12px;text-align:left;
+    font-weight:600;color:var(--accent);
+    border-bottom:1px solid var(--border);
+  }
+  .q-table td{padding:7px 12px;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .q-table tr:last-child td{border-bottom:none;}
+
+  /* ── STEP LIST ── */
+  .step-list{list-style:none;margin-bottom:14px;}
+  .step-list li{
+    padding:7px 0 7px 24px;
+    position:relative;font-size:13px;
+    border-bottom:1px solid rgba(255,255,255,0.04);
+  }
+  .step-list li::before{
+    content:attr(data-step);
+    position:absolute;left:0;
+    font-weight:700;color:var(--accent);
+    font-family:'JetBrains Mono',monospace;font-size:12px;
+  }
+
+  /* ── SCROLL TO TOP ── */
+  .scroll-top{
+    position:fixed;bottom:24px;left:24px;
+    width:44px;height:44px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:18px;
+    z-index:100;opacity:0;pointer-events:none;
+    transition:all .3s;
+  }
+  .scroll-top.visible{opacity:1;pointer-events:all;}
+  .scroll-top:hover{background:var(--surface);border-color:var(--accent);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="school-badge">🏫 SMK Negeri 1 Maluku Tengah</div>
+    <h1>English <span>Competency</span> Quiz</h1>
+    <p style="color:var(--muted);font-size:13px;margin-top:4px;">Kelas X AKL · Semester Genap · Tahun Ajaran 2025/2026</p>
+    <div class="header-meta">
+      <span class="meta-chip"><span class="dot"></span>25 Soal Pilihan Ganda</span>
+      <span class="meta-chip"><span class="dot" style="background:var(--accent3)"></span>Speaking · Reading · Writing</span>
+      <span class="meta-chip"><span class="dot" style="background:var(--accent2)"></span>Guru: A. Bahy, S.Pd., M.Pd</span>
+    </div>
+  </div>
+</header>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap">
+  <div class="progress-inner">
+    <span class="progress-label" id="prog-label">0 / 25</span>
+    <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+    <span class="score-counter" id="score-counter">Score: 0</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main" id="quiz-main">
+
+  <!-- ═══════════ ELEMENT 1: SPEAKING ═══════════ -->
+  <div class="section-header">
+    <span class="section-icon">🎤</span>
+    <div>
+      <h2>ELEMENT 1 — SPEAKING (Reading-Based)</h2>
+      <p>Questions 1–8 · Comprehension, Vocabulary, and Inference</p>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="qcard-1">
+    <span class="q-number">Question 01</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>"The treasurer received a payment of Rp 5,000,000 from a client and recorded it as a credit to the company's revenue account in the accounting system."</div>
+    <p class="q-stem">Speaking context: You are explaining this transaction to a new colleague.<br><strong>What does the word "CREDIT" mean in this accounting context?</strong></p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Money that is deducted from a bank account</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Money recorded as income or added to a revenue account</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> A loan that must be repaid to a bank</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> A penalty charged by the accounting software</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> A transfer fee between two companies</button>
+    </div>
+    <div class="feedback" id="fb-1">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Dalam akuntansi, <strong>credit (kredit)</strong> berarti pencatatan yang menambah akun pendapatan, ekuitas, atau kewajiban. Ketika klien membayar dan dicatat sebagai kredit ke revenue account, artinya perusahaan <strong>menerima pemasukan</strong>. Ini berbeda dengan penggunaan sehari-hari kata "kredit" (pinjaman). Jawaban A salah karena itu definisi debit. Jawaban C salah karena kredit bukan pinjaman dalam konteks ini.</div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="qcard-2">
+    <span class="q-number">Question 02</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>"Follow the PROTOCOL below when handling a customer refund: verify the original receipt, confirm the amount, obtain supervisor approval, then process the return."</div>
+    <p class="q-stem">Speaking context: You are presenting this guide to trainees.<br><strong>Which word is the CLOSEST synonym for "PROTOCOL" as used in this instruction?</strong></p>
+    <div class="options" data-correct="C">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Document</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Permission</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Procedure</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Penalty</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Output</button>
+    </div>
+    <div class="feedback" id="fb-2">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body"><strong>Protocol</strong> dalam konteks instruksi kerja berarti <strong>prosedur/tata cara</strong> yang harus diikuti secara berurutan. Sinonimnya yang paling tepat adalah <strong>procedure</strong> (prosedur). Kata "document" hanya berarti dokumen (benda), bukan urutan langkah. "Permission" = izin, "Penalty" = sanksi, "Output" = hasil — semuanya tidak berkaitan dengan urutan tata cara.</div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="qcard-3">
+    <span class="q-number">Question 03</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>Rina Pattiwael is a first-year accounting student at SMK Negeri 1 Maluku Tengah. She always prepares her stationery and textbooks the night before school. She uses a digital ledger app to practice recording transactions, and she submits every assignment one day before the deadline. Her classmates often ask for her help when they do not understand journal entries.</div>
+    <p class="q-stem">Speaking context: You are presenting Rina's profile in class.<br><strong>Based on the text, which statement is TRUE about Rina?</strong></p>
+    <div class="options" data-correct="D">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Rina uses printed paper ledgers to record transactions</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Rina often submits assignments late</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Rina is unpopular among her classmates</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Rina uses a digital ledger app to practice recording transactions</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Rina dislikes helping others with journal entries</button>
+    </div>
+    <div class="feedback" id="fb-3">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Teks secara eksplisit menyatakan: <em>"She uses a digital ledger app to practice recording transactions."</em> Maka jawaban <strong>D adalah BENAR</strong>. Jawaban A salah (ia pakai digital, bukan kertas). B salah (ia mengumpulkan tugas sehari sebelum deadline). C salah (teman-temannya meminta bantuan = ia populer). E salah (ia membantu teman yang kesulitan).</div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="qcard-4">
+    <span class="q-number">Question 04</span>
+    <div class="q-context"><span class="ctx-label">📌 Steps (Random Order)</span>
+      <ul class="step-list">
+        <li data-step="(P)">Save the completed voucher to the company's digital archive.</li>
+        <li data-step="(Q)">Fill in the payment amount, date, and recipient's name.</li>
+        <li data-step="(R)">Obtain the supervisor's signature for authorization.</li>
+        <li data-step="(S)">Collect the original invoice from the supplier.</li>
+        <li data-step="(T)">Prepare a blank payment voucher form.</li>
+      </ul>
+    </div>
+    <p class="q-stem">Speaking context: You must explain this procedure in the correct order to a trainee.<br><strong>Which sequence represents the CORRECT procedure?</strong></p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="A"><span class="option-letter">A</span> T → Q → S → R → P</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> S → T → Q → R → P</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Q → S → T → P → R</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> R → S → T → Q → P</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> S → Q → T → P → R</button>
+    </div>
+    <div class="feedback" id="fb-4">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Urutan logis prosedur voucher pembayaran: <strong>S</strong> (ambil invoice dari supplier) → <strong>T</strong> (siapkan formulir voucher) → <strong>Q</strong> (isi jumlah, tanggal, nama) → <strong>R</strong> (minta tanda tangan supervisor) → <strong>P</strong> (simpan ke arsip digital). Anda harus memiliki dokumen referensi (invoice) dahulu sebelum menyiapkan formulir, dan tanda tangan dilakukan setelah diisi, bukan sebelumnya.</div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="qcard-5">
+    <span class="q-number">Question 05</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>Benny Latupeirissa is a senior bookkeeper at a cooperative in Masohi. Every morning, he cross-checks the previous day's cash flow records against the bank statement. He keeps a personal notebook of recurring errors he has encountered so that he can avoid them in the future. He also voluntarily trains new staff members on weekends without being asked.</div>
+    <p class="q-stem">Speaking context: You are describing Benny's professional character in a team briefing.<br><strong>Based on the implicit cues, what can be CONCLUDED about Benny's professional attitude?</strong></p>
+    <div class="options" data-correct="A">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Benny is a meticulous and self-motivated professional who values accuracy and continuous improvement</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Benny is an overworked employee who cannot delegate tasks effectively</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Benny trains new staff because he is required to by his supervisor</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Benny focuses more on past errors than on current accounting tasks</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Benny is a slow worker who needs extra time to verify his records</button>
+    </div>
+    <div class="feedback" id="fb-5">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Petunjuk implisit dalam teks: <em>cross-checks records setiap pagi</em> → cermat/teliti; <em>menyimpan catatan kesalahan sendiri</em> → proaktif belajar dari pengalaman; <em>melatih staf baru secara sukarela tanpa diminta</em> → motivasi diri tinggi. Semua petunjuk ini mendukung kesimpulan bahwa Benny adalah profesional yang <strong>meticulous dan self-motivated</strong>. B, C, D, E tidak didukung oleh bukti teks.</div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="qcard-6">
+    <span class="q-number">Question 06</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>Citra Marasabessy is a third-year accounting student who joins her school's accounting club every Monday and Wednesday. She practices journal entries for no less than 90 minutes each session and consistently earns the highest scores on accounting lab tests throughout the semester.</div>
+    <p class="q-stem">Speaking context: You are presenting Citra's character profile to a recruitment panel.<br><strong>The phrases "every Monday and Wednesday," "no less than 90 minutes," and "consistently" suggest what about Citra?</strong></p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Citra studies only when an important exam is near</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Citra demonstrates regular, disciplined commitment to her accounting skills</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Citra joins the club because her teacher requires it</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Citra has difficulty understanding journal entries without repetition</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Citra focuses only on lab tests and ignores theoretical accounting</button>
+    </div>
+    <div class="feedback" id="fb-6">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Signal words (kata sinyal) dalam soal ini berfungsi sebagai penanda frekuensi dan konsistensi: <strong>"every Monday and Wednesday"</strong> = rutinitas teratur; <strong>"no less than 90 minutes"</strong> = durasi minimum yang konsisten; <strong>"consistently"</strong> = terus-menerus, tidak berubah. Kombinasi ketiganya menunjukkan <strong>komitmen yang teratur dan berdisiplin</strong> (option B). Bukan karena terpaksa atau kesulitan belajar.</div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="qcard-7">
+    <span class="q-number">Question 07</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>When a discrepancy appears in the petty cash report, Wulan does not panic or immediately report to her manager. She first re-counts all physical cash, re-checks the receipt folder, and compares the totals with the ledger before drafting her findings in writing.</div>
+    <p class="q-stem">Speaking context: You are highlighting Wulan's strengths in a staff appraisal presentation.<br><strong>Based on the action words and context clues, what can be concluded about Wulan's working style?</strong></p>
+    <div class="options" data-correct="C">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Wulan is afraid of her manager and avoids reporting problems</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Wulan lacks the confidence to resolve accounting issues on her own</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Wulan is systematic and thorough — she verifies multiple sources before drawing conclusions</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Wulan wastes time by recounting cash instead of using software</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Wulan is impulsive and makes decisions without checking records</button>
+    </div>
+    <div class="feedback" id="fb-7">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Kata kerja aksi dalam teks: <em>re-counts, re-checks, compares</em> — semua menunjukkan proses verifikasi bertahap sebelum mengambil kesimpulan. Ini adalah ciri gaya kerja yang <strong>sistematis dan teliti</strong>. Jawaban A salah karena teks tidak menunjukkan rasa takut. E jelas salah karena Wulan justru sangat hati-hati, bukan impulsif. D bersifat opini negatif yang tidak didukung teks.</div>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="question-card" id="qcard-8">
+    <span class="q-number">Question 08</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>"Andi Tuasikal is a second-year accounting student who tutors his juniors every Friday afternoon. He spends at least two hours each day solving practice problems from accounting textbooks. He also reads the latest government financial regulation updates published online every month."</div>
+    <p class="q-stem">Speaking context: In a debate, you must defend the MOST LOGICAL inference about Andi.<br><strong>Which inference about Andi is the MOST LOGICAL and supported by the STRONGEST evidence?</strong></p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Andi wants to become a government auditor because he reads government regulations</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Andi is likely to excel academically and professionally because he consistently practices skills, helps others, and stays updated on regulations — all supported by multiple specific behaviours</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Andi is too focused on textbooks and has no real-world accounting experience</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Andi tutors juniors because the school requires him to do community service hours</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Andi has no time for socializing because he spends all day studying</button>
+    </div>
+    <div class="feedback" id="fb-8">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Inferensi yang baik harus: (1) logis dan (2) didukung oleh bukti teks yang kuat. Opsi <strong>B</strong> didukung TIGA bukti spesifik: <em>mengajar junior setiap Jumat</em> (mengajar = pemahaman mendalam), <em>berlatih 2 jam/hari</em> (ketekunan), dan <em>membaca regulasi terbaru</em> (up-to-date). Opsi A hanya asumsi dari satu fakta. D dan E adalah asumsi negatif tanpa dukungan teks. Inferensi yang baik = banyak bukti + logika yang kuat.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ELEMENT 2: READING-VIEWING ═══════════ -->
+  <div class="section-header">
+    <span class="section-icon">📖</span>
+    <div>
+      <h2>ELEMENT 2 — READING & VIEWING</h2>
+      <p>Questions 9–18 · Vocabulary in Context, Infographic Analysis, and Critical Reading</p>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="question-card" id="qcard-9">
+    <span class="q-number">Question 09</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>"After the employee submitted her reimbursement claim, the finance department verified the receipts and the approved amount was credited back to her salary account."</div>
+    <p class="q-stem"><strong>What does "CREDITED BACK" mean in the sentence above?</strong></p>
+    <div class="options" data-correct="C">
+      <button class="option" data-val="A"><span class="option-letter">A</span> The money was deducted from the employee's salary</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> The claim was rejected by the finance department</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> The approved amount was returned and added to the employee's account</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> The employee received a penalty for late submission</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> The finance department borrowed money from the employee</button>
+    </div>
+    <div class="feedback" id="fb-9">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body"><strong>"Credited back"</strong> = dikembalikan/ditambahkan kembali ke akun. Kata "back" menunjukkan pengembalian uang (reimbursement), dan "credited" menunjukkan penambahan ke akun. Jadi, uang yang telah dikeluarkan karyawan <strong>dikembalikan ke rekeningnya</strong>. Ini bukan pengurangan (A), bukan penolakan (B), bukan penalti (D), dan bukan pinjaman (E).</div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="question-card" id="qcard-10">
+    <span class="q-number">Question 10</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>"The annual inventory count was LABORIOUS because the warehouse contained thousands of items categorized across twenty different sections, and each item required individual verification against the purchase order."</div>
+    <p class="q-stem"><strong>Based on the context clues, what is the most likely meaning of "LABORIOUS"?</strong></p>
+    <div class="options" data-correct="D">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Quick and automated</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Inaccurate and unreliable</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Entertaining and rewarding</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Requiring great effort and time</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Simple and straightforward</button>
+    </div>
+    <div class="feedback" id="fb-10">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Petunjuk konteks: "ribuan item di 20 bagian berbeda" + "setiap item diverifikasi satu per satu" = pekerjaan yang sangat banyak dan membutuhkan waktu lama. Maka <strong>laborious</strong> = membutuhkan usaha dan waktu besar (requiring great effort and time). Akar kata: labor = kerja keras. A salah (justru tidak otomatis). E berlawanan langsung. B dan C tidak relevan dengan konteks.</div>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="question-card" id="qcard-11">
+    <span class="q-number">Question 11</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>Hendra Lesnussa is a third-year accounting student who prepares a summary of weekly cash flow every Sunday evening. He attends every accounting workshop offered by his school without missing a single session. He also voluntarily creates visual summaries of financial statements for his classmates.</div>
+    <p class="q-stem"><strong>Which of the following is an EXPLICITLY STATED (explicit) fact about Hendra?</strong></p>
+    <div class="options" data-correct="A">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Hendra prepares a summary of weekly cash flow every Sunday evening</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Hendra plans to become a financial analyst after graduation</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Hendra is the most talented student in his school</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Hendra prefers visual learning over reading textbooks</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Hendra's classmates find financial statements too difficult to understand</button>
+    </div>
+    <div class="feedback" id="fb-11">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body"><strong>Fakta eksplisit</strong> = informasi yang SECARA LANGSUNG disebutkan dalam teks, bukan interpretasi. Opsi <strong>A</strong> adalah satu-satunya yang dikutip langsung dari teks: <em>"prepares a summary of weekly cash flow every Sunday evening."</em> Opsi B, C, D, E adalah inferensi atau asumsi yang tidak disebutkan secara langsung. Penting: dalam soal reading, bedakan antara yang TERTULIS dan yang DISIMPULKAN.</div>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="question-card" id="qcard-12">
+    <span class="q-number">Question 12</span>
+    <div class="q-context"><span class="ctx-label">📌 Infographic: Digital Payment Flow</span>
+      <table class="q-table">
+        <tr><th>Step</th><th>Status</th><th>Description</th></tr>
+        <tr><td>1. Open App</td><td>✅ Done</td><td>Customer logs in to mobile banking</td></tr>
+        <tr><td>2. Select Payment</td><td>✅ Done</td><td>Customer selects the merchant</td></tr>
+        <tr><td>3. Check Balance</td><td>⚠️ WARNING</td><td>Balance (Rp 20,000) is below required amount (Rp 75,000)</td></tr>
+        <tr><td>4. ???</td><td>⏳ Pending</td><td>Action required</td></tr>
+      </table>
+    </div>
+    <p class="q-stem"><strong>According to the infographic flow, what should happen NEXT at Step 4?</strong></p>
+    <div class="options" data-correct="E">
+      <button class="option" data-val="A"><span class="option-letter">A</span> The system automatically completes the payment using a credit limit</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> The merchant cancels the transaction permanently</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> The customer's account is frozen by the bank</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> The bank automatically deducts from a different account</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> The customer must top up their balance before the payment can proceed</button>
+    </div>
+    <div class="feedback" id="fb-12">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Infografik menunjukkan peringatan (⚠️ WARNING) karena saldo (Rp 20.000) <strong>lebih kecil</strong> dari jumlah yang dibutuhkan (Rp 75.000). Langkah berikutnya yang logis adalah <strong>isi ulang saldo (top up)</strong> agar pembayaran bisa dilanjutkan. Tidak ada informasi bahwa sistem otomatis mengambil limit kredit (A) atau membekukan akun (C). Membaca infografik berarti memahami alur visual + status + logika tahap selanjutnya.</div>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="question-card" id="qcard-13">
+    <span class="q-number">Question 13</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>A junior accountant follows these steps to prepare the monthly payroll:
+      <ul class="step-list">
+        <li data-step="1.">Collect attendance data from the HR department.</li>
+        <li data-step="2.">Calculate gross salary for each employee.</li>
+        <li data-step="3.">Click "Process Payroll" in the payroll software.</li>
+        <li data-step="4.">Distribute payslips to all employees.</li>
+      </ul>
+      The payroll officer later discovers that tax deductions were never applied.
+    </div>
+    <p class="q-stem"><strong>Which MISSING step most likely caused this error?</strong></p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="A"><span class="option-letter">A</span> The accountant forgot to collect attendance data</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> The accountant should have applied tax deductions and calculated net salary before processing payroll</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> The accountant should have distributed payslips before processing payroll</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> The payroll software was not properly installed</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> The HR department provided incorrect attendance data</button>
+    </div>
+    <div class="feedback" id="fb-13">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Setelah menghitung gaji bruto (gross salary), langkah standar payroll adalah: <strong>potong pajak/BPJS → hitung gaji bersih (net salary) → baru proses payroll</strong>. Langkah antara step 2 dan 3 yang hilang adalah <strong>penerapan potongan pajak dan perhitungan gaji bersih</strong>. Inilah yang menyebabkan pajak tidak teraplikasi. A, D, E tidak didukung teks. C secara logis tidak mungkin (payslip diberikan setelah payroll diproses).</div>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="question-card" id="qcard-14">
+    <span class="q-number">Question 14</span>
+    <div class="q-context"><span class="ctx-label">📌 Accounting Cycle Diagram</span>
+      <p style="font-size:13px;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;font-family:'JetBrains Mono',monospace;">
+        Identify → Record → Post → <span style="color:var(--warn);font-weight:700;">[Trial Balance SKIPPED]</span> → Adjusting Entries → Financial Statements → Closing
+      </p>
+    </div>
+    <p class="q-stem">A company skips the Trial Balance step to save time. <strong>What would MOST LIKELY happen as a result?</strong></p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Adjusting entries will automatically correct any debit-credit imbalances</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Errors in debit-credit balancing would remain undetected, potentially making financial statements inaccurate</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> The accounting cycle will restart automatically from Step 1</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> The company will receive an immediate warning from the tax authority</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> The closing entries will become unnecessary at period end</button>
+    </div>
+    <div class="feedback" id="fb-14">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body"><strong>Trial Balance</strong> berfungsi sebagai "filter kesalahan" — memastikan total debit = total kredit sebelum melanjutkan. Jika dilewati, <strong>kesalahan pencatatan tidak akan terdeteksi</strong> dan akan ikut terbawa ke laporan keuangan, menyebabkan laporan menjadi tidak akurat. Adjusting entries (A) tidak dirancang untuk mendeteksi ketidakseimbangan debit-kredit — itu bukan fungsinya. D dan C adalah asumsi yang tidak berdasar.</div>
+    </div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="question-card" id="qcard-15">
+    <span class="q-number">Question 15</span>
+    <div class="q-context"><span class="ctx-label">📌 Visual Color Coding System</span>
+      <table class="q-table">
+        <tr><th>Color</th><th>Symbol</th><th>Meaning</th></tr>
+        <tr><td style="color:var(--accent3)">GREEN</td><td>✅</td><td>On target — within acceptable budget range</td></tr>
+        <tr><td style="color:var(--warn)">YELLOW</td><td>⚠️</td><td>Caution — approaching budget limit</td></tr>
+        <tr><td style="color:var(--danger)">RED</td><td>🔴</td><td>Over budget — requires immediate corrective action</td></tr>
+      </table>
+      A student sees a RED icon next to "Operational Expenses" in the Q3 report.
+    </div>
+    <p class="q-stem"><strong>What should the student conclude about the company's Q3 Operational Expenses?</strong></p>
+    <div class="options" data-correct="C">
+      <button class="option" data-val="A"><span class="option-letter">A</span> The company's Q3 operational expenses are within the planned budget</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> The RED icon shows the data is still being processed and is not yet final</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> The company's Q3 operational expenses have exceeded the budget and need immediate corrective action</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> The company should reward employees because costs were managed well</option>
+      <button class="option" data-val="E"><span class="option-letter">E</span> RED means the data is confidential and should not be shared with stakeholders</button>
+    </div>
+    <div class="feedback" id="fb-15">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Membaca infografik = memahami legenda (keterangan warna/simbol). Berdasarkan tabel kode warna: <strong>MERAH = Over budget — requires immediate corrective action.</strong> Maka jika ikon merah muncul di "Operational Expenses", kesimpulannya: biaya operasional <strong>melebihi anggaran</strong> dan butuh tindakan segera. Jawaban A (dalam anggaran) berlawanan dengan makna warna merah. B, D, E tidak sesuai dengan legenda yang diberikan.</div>
+    </div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="question-card" id="qcard-16">
+    <span class="q-number">Question 16</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>An accounting teacher designs a lesson on the cash flow statement. She chooses to present the information using a diagram with arrows, color-coded boxes, and bold labels instead of a dense paragraph of written text.</div>
+    <p class="q-stem"><strong>Which reason BEST explains why the visual diagram is more effective for teaching this topic?</strong></p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Diagrams are always more expensive to produce, which shows greater teacher effort</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Visual elements such as arrows, colors, and labels clarify the relationships between components, making sequential and structural information faster to understand and easier to retain</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Diagrams require no literacy skills, making them better than all other teaching media</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Text paragraphs are always less accurate than diagrams for financial content</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Indonesian curriculum regulations require teachers to use diagrams for all accounting topics</button>
+    </div>
+    <div class="feedback" id="fb-16">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Keunggulan visual/diagram atas teks padat: panah menunjukkan <strong>urutan dan hubungan</strong>, warna membantu <strong>kategorisasi cepat</strong>, label tebal membantu <strong>identifikasi komponen utama</strong>. Semua ini mempercepat pemahaman dan memperkuat daya ingat. Opsi B merangkum fungsi-fungsi ini dengan tepat. A, C, D, E mengandung generalisasi berlebihan ("always", "all") atau alasan yang tidak relevan.</div>
+    </div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="question-card" id="qcard-17">
+    <span class="q-number">Question 17</span>
+    <div class="q-context"><span class="ctx-label">📌 Accounting Cycle Diagram</span>
+      <p style="font-size:13px;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;font-family:'JetBrains Mono',monospace;">
+        Identify → Record → Post → Trial Balance → <span style="color:var(--danger);font-weight:700;">[Adjusting Entries SKIPPED]</span> → Financial Statements → Closing
+      </p>
+      The accountant skips Adjusting Entries believing all journal entries are already complete.
+    </div>
+    <p class="q-stem"><strong>Which analysis BEST explains the impact of this decision?</strong></p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="A"><span class="option-letter">A</span> No impact — the trial balance already confirms debit equals credit, so the statements are accurate</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Financial statements will be inaccurate because unrecorded accrued expenses, prepaid items, and depreciation will distort both revenue and expense figures</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> The company will save significant time and produce simpler, more readable financial statements</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Only the closing entries will be affected; the financial statements themselves will remain correct</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> The impact will only appear in the next accounting period, not the current one</button>
+    </div>
+    <div class="feedback" id="fb-17">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body"><strong>Adjusting Entries (Jurnal Penyesuaian)</strong> berfungsi untuk mencatat item-item yang belum terekam: beban yang sudah terjadi tapi belum dibayar (accrued expenses), biaya dibayar di muka (prepaid), dan penyusutan (depreciation). Jika dilewati, laporan keuangan akan <strong>melebih-lebihkan pendapatan dan meremehkan beban</strong>, sehingga laba bersih yang ditampilkan TIDAK AKURAT. Trial balance (A) hanya memverifikasi bahwa debit = kredit — bukan memastikan kelengkapan pencatatan.</div>
+    </div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="question-card" id="qcard-18">
+    <span class="q-number">Question 18</span>
+    <div class="q-context"><span class="ctx-label">📌 Candidate Profiles</span>
+      <table class="q-table">
+        <tr><th>Profile</th><th>Key Behaviours</th></tr>
+        <tr><td><strong>Vera</strong> (Junior Accountant)</td><td>Reconciles cash daily, arrives 20 min early, reads tax law updates monthly, documents all corrected errors</td></tr>
+        <tr><td><strong>Galih</strong> (Accounting Student)</td><td>Leads class project every semester, scores top in exams, volunteers for school accounting fair, helps peers</td></tr>
+      </table>
+      A formal bank branch seeks a junior accountant for its compliance division.
+    </div>
+    <p class="q-stem"><strong>Which evaluation BEST supports selecting Vera over Galih for this role?</strong></p>
+    <div class="options" data-correct="C">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Vera should be selected because she is older and therefore more reliable</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Galih should be selected because his leadership in class projects shows stronger management potential</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Vera's behaviours — daily reconciliation, punctuality, regulatory awareness, and error documentation — directly mirror the accuracy and compliance demands of a formal banking environment</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Neither is suitable because both lack formal bank experience</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Galih is more suitable because academic performance is the most important criterion for banking roles</button>
+    </div>
+    <div class="feedback" id="fb-18">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Divisi kepatuhan (compliance) bank membutuhkan: ketelitian, ketepatan waktu, pemahaman regulasi, dan dokumentasi kesalahan. Perilaku <strong>Vera</strong> (rekonsiliasi harian, datang lebih awal, membaca pembaruan hukum pajak, mendokumentasikan kesalahan) secara langsung mencerminkan keempat tuntutan tersebut. Galih lebih menunjukkan kepemimpinan akademik, yang kurang relevan untuk compliance banking. Evaluasi rekrutmen harus berbasis <strong>keselarasan perilaku dengan kebutuhan posisi</strong>, bukan usia atau nilai akademik semata.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ELEMENT 3: WRITING-PRESENTING ═══════════ -->
+  <div class="section-header">
+    <span class="section-icon">✍️</span>
+    <div>
+      <h2>ELEMENT 3 — WRITING & PRESENTING</h2>
+      <p>Questions 19–25 · Terminology, Sequencing, Inference, and Character Analysis</p>
+    </div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="question-card" id="qcard-19">
+    <span class="q-number">Question 19</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>"A vendor delivered office supplies worth Rp 3,200,000. The company provided the vendor with a printed document listing the items delivered, their quantities, and the total amount owed by the company."</div>
+    <p class="q-stem">In writing a financial report, what is the correct term for the document SENT BY THE VENDOR to request payment?</p>
+    <div class="options" data-correct="A">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Invoice</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Receipt</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Voucher</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Balance Sheet</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Journal Entry</button>
+    </div>
+    <div class="feedback" id="fb-19">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body"><strong>Invoice (faktur)</strong> = dokumen yang dikirim oleh penjual/vendor kepada pembeli berisi daftar barang/jasa, jumlah, dan total tagihan yang harus dibayar. Berbeda dengan: <strong>Receipt</strong> = bukti bahwa pembayaran SUDAH diterima; <strong>Voucher</strong> = bukti internal transaksi; <strong>Balance Sheet</strong> = laporan posisi keuangan; <strong>Journal Entry</strong> = pencatatan transaksi dalam buku jurnal. Kunci: invoice = tagihan dari vendor, receipt = bukti bayar sudah lunas.</div>
+    </div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="question-card" id="qcard-20">
+    <span class="q-number">Question 20</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>"The presentation slide uses BLUE color for completed tasks, ORANGE color for tasks currently in progress, and RED color for tasks that are overdue and require urgent resolution."</div>
+    <p class="q-stem">In the context of designing a project progress presentation, what does the ORANGE color indicate?</p>
+    <div class="options" data-correct="C">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Tasks that have been fully completed and archived</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Tasks that are overdue and require urgent action</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Tasks that are currently being worked on and are still in progress</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Tasks that are optional and can be skipped</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Tasks that apply only to senior management</button>
+    </div>
+    <div class="feedback" id="fb-20">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Teks secara eksplisit mendefinisikan: BIRU = selesai, <strong>ORANYE = sedang dikerjakan (in progress)</strong>, MERAH = terlambat/urgent. Membaca pertanyaan tentang kode warna = membaca LEGENDA dengan cermat dan mencocokkan warna dengan definisinya. Jawaban B (terlambat) = definisi MERAH, bukan oranye. Hindari menukar definisi antar warna.</div>
+    </div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="question-card" id="qcard-21">
+    <span class="q-number">Question 21</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>"To activate your prepaid debit card, you must first RELOAD your card by visiting an authorized agent or transferring funds through internet banking. The minimum reload amount is Rp 50,000."</div>
+    <p class="q-stem">In the context of writing a digital banking guide, what does "RELOAD" mean?</p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="B"><span class="option-letter">B</span> Adding money to the prepaid debit card balance</button>
+      <button class="option" data-val="A"><span class="option-letter">A</span> Withdrawing cash from the debit card at an ATM</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Converting the card balance into a different currency</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Cancelling the debit card and requesting a new one</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Transferring money from the card to another person's account</button>
+    </div>
+    <div class="feedback" id="fb-21">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body"><strong>Reload</strong> (dalam konteks kartu prabayar/e-wallet) = <strong>mengisi ulang saldo</strong> kartu dengan cara mentransfer dana. Petunjuk konteks: "visiting an authorized agent or transferring funds" = cara mengisi saldo. Ini sama dengan istilah "top-up" yang umum digunakan di Indonesia. A (tarik tunai), C (konversi mata uang), D (batalkan kartu), E (kirim ke orang lain) — semuanya BERBEDA dari mengisi saldo kartu sendiri.</div>
+    </div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="question-card" id="qcard-22">
+    <span class="q-number">Question 22</span>
+    <div class="q-context"><span class="ctx-label">📌 Steps (Random Order)</span>
+      <ul class="step-list">
+        <li data-step="(P)">Print or export the receipt as confirmation of payment.</li>
+        <li data-step="(Q)">Enter the payee's account number and verify the details.</li>
+        <li data-step="(R)">Log in to the company's internet banking portal.</li>
+        <li data-step="(S)">Select "Transfer" and choose the destination bank.</li>
+        <li data-step="(T)">Enter the transfer amount and click "Confirm."</li>
+      </ul>
+    </div>
+    <p class="q-stem">Which sequence is CORRECT for writing this as a structured procedure guide?</p>
+    <div class="options" data-correct="C">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Q → R → S → T → P</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> R → Q → T → S → P</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> R → S → Q → T → P</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> T → R → S → Q → P</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> S → R → Q → P → T</button>
+    </div>
+    <div class="feedback" id="fb-22">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Urutan logis transfer internet banking: <strong>R</strong> (login portal dulu) → <strong>S</strong> (pilih menu Transfer & bank tujuan) → <strong>Q</strong> (masukkan nomor rekening & verifikasi) → <strong>T</strong> (masukkan jumlah & konfirmasi) → <strong>P</strong> (cetak/ekspor struk). Anda tidak bisa memasukkan nomor rekening (Q) sebelum memilih menu Transfer (S), dan tidak bisa mengkonfirmasi (T) sebelum rekening diverifikasi (Q). Urutan ini mengikuti alur penggunaan nyata aplikasi internet banking.</div>
+    </div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="question-card" id="qcard-23">
+    <span class="q-number">Question 23</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>
+      <p style="font-size:13px;margin-bottom:6px;"><strong>Text 1 – Vera:</strong> "She reconciles all cash records every morning before opening the office."</p>
+      <p style="font-size:13px;"><strong>Text 2 – Benny:</strong> "He spends his lunch break reviewing transaction data from the previous day and flags any inconsistencies for his supervisor."</p>
+    </div>
+    <p class="q-stem">Context: You are writing a professional profile report comparing both characters.<br><strong>Which of the following is IMPLICIT (not explicitly stated) information you would need to infer?</strong></p>
+    <div class="options" data-correct="C">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Vera reconciles cash records every morning</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Benny spends his lunch break reviewing transaction data</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Both Vera and Benny are highly committed to maintaining financial accuracy in their workplace</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Benny flags inconsistencies for his supervisor</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Vera reconciles records before opening the office</button>
+    </div>
+    <div class="feedback" id="fb-23">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body"><strong>Informasi implisit</strong> = kesimpulan yang TIDAK langsung tertulis, tetapi dapat ditarik dari bukti yang ada. Opsi A, B, D, E semuanya tertulis LANGSUNG di teks (eksplisit). Opsi <strong>C</strong> ("highly committed to maintaining financial accuracy") adalah <strong>kesimpulan/inferensi</strong> yang ditarik dari perilaku keduanya — teks tidak pernah menggunakan kata-kata itu secara langsung. Ini adalah contoh membedakan fakta tersurat vs. kesimpulan tersirat.</div>
+    </div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="question-card" id="qcard-24">
+    <span class="q-number">Question 24</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>"Nita always verifies every figure in her reports twice before submitting them. She arrives at the office 15 minutes early every day. She spends her own money to purchase updated accounting textbooks each year. When junior colleagues make mistakes, Nita explains the correct procedure to them calmly without criticizing them personally."</div>
+    <p class="q-stem">Context: You are designing a professional profile slide for Nita.<br><strong>Considering ALL the evidence, which personality trait BEST fits as Nita's slide title?</strong></p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Ambitious and Competitive</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Diligent, Detail-Oriented, and Supportive</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Strict and Critical of Colleagues</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Introverted and Avoids Teamwork</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Innovative and Technology-Driven</button>
+    </div>
+    <div class="feedback" id="fb-24">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Setiap kalimat dalam teks mencerminkan satu sifat karakter Nita: <em>"verifies twice"</em> → <strong>detail-oriented</strong>; <em>"arrives 15 min early"</em> → <strong>diligent/rajin</strong>; <em>"buys updated textbooks"</em> → komitmen terhadap belajar; <em>"explains calmly without criticizing"</em> → <strong>supportive/mendukung</strong>. Kombinasi ketiganya paling tepat diwakili oleh opsi B. A tidak didukung (tidak ada kompetisi). C salah (ia tidak mengkritik, justru sebaliknya). D salah (ia berinteraksi aktif dengan junior).</div>
+    </div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="question-card" id="qcard-25">
+    <span class="q-number">Question 25</span>
+    <div class="q-context"><span class="ctx-label">📌 Context</span>"Riko Tuasikal works as a junior finance officer. He always double-checks every figure before signing off on a report. He comes to work 20 minutes early each day. On holidays, he voluntarily reads new government finance regulations. When a colleague inputs incorrect data, Riko patiently re-explains the correct entry procedure."</div>
+    <p class="q-stem">Context: Four students each identify a different personality trait for a formal report.<br><strong>Which student's analysis is supported by the MOST EVIDENCE from the text?</strong></p>
+    <div class="options" data-correct="B">
+      <button class="option" data-val="A"><span class="option-letter">A</span> Student 1: "Riko is career-driven" — evidenced only by his early arrival</button>
+      <button class="option" data-val="B"><span class="option-letter">B</span> Student 2: "Riko is conscientious and professionally responsible" — evidenced by double-checking reports, early arrival, self-study on holidays, and patiently guiding colleagues</button>
+      <button class="option" data-val="C"><span class="option-letter">C</span> Student 3: "Riko is friendly" — evidenced only by re-explaining to colleagues patiently</button>
+      <button class="option" data-val="D"><span class="option-letter">D</span> Student 4: "Riko is overworked" — evidenced by coming to work early and reading on holidays</button>
+      <button class="option" data-val="E"><span class="option-letter">E</span> Student 5: "Riko wants a promotion" — evidenced by reading government regulations on holidays</button>
+    </div>
+    <div class="feedback" id="fb-25">
+      <div class="feedback-title">— Penjelasan</div>
+      <div class="feedback-body">Analisis yang kuat harus didukung oleh <strong>banyak bukti yang relevan dan spesifik</strong>. Opsi <strong>B</strong> mengutip EMPAT bukti: (1) memeriksa dua kali, (2) datang lebih awal, (3) belajar mandiri di hari libur, (4) membimbing kolega dengan sabar. Semua ini mendukung satu kesimpulan: <strong>conscientious dan bertanggung jawab</strong>. Opsi A, C, E hanya menggunakan SATU bukti dan menarik kesimpulan yang terlalu jauh. D menafsirkan perilaku positif secara negatif tanpa dukungan teks.</div>
+    </div>
+  </div>
+
+  <!-- SUBMIT BUTTON -->
+  <div class="submit-wrap">
+    <button class="btn-submit" id="btn-submit" onclick="submitQuiz()">
+      📊 Lihat Hasil Skor Saya
+    </button>
+  </div>
+
+  <!-- RESULT PANEL -->
+  <div id="result-panel">
+    <div class="result-emoji" id="result-emoji">🎉</div>
+    <div class="result-score-big" id="result-score-big">0/25</div>
+    <div class="result-label">Total Questions Answered Correctly</div>
+    <div class="result-grade" id="result-grade">—</div>
+    <div class="result-message" id="result-message"></div>
+    <button class="btn-restart" onclick="restartQuiz()">🔄 Coba Lagi / Restart Quiz</button>
+  </div>
+
+</main>
+
+<!-- FLOATING TOAST -->
+<div class="floating-toast" id="toast"></div>
+
+<!-- SCROLL TO TOP -->
+<div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script>
+const QUESTIONS = 25;
+const CORRECT_ANSWERS = {
+  1:'B',2:'C',3:'D',4:'B',5:'A',6:'B',7:'C',8:'B',9:'C',10:'D',
+  11:'A',12:'E',13:'B',14:'B',15:'C',16:'B',17:'B',18:'C',19:'A',20:'C',
+  21:'B',22:'C',23:'C',24:'B',25:'B'
+};
+let answered = {};
+let score = 0;
+let toastTimer = null;
+
+function updateProgress(){
+  const count = Object.keys(answered).length;
+  document.getElementById('prog-label').textContent = count + ' / ' + QUESTIONS;
+  document.getElementById('prog-fill').style.width = (count/QUESTIONS*100)+'%';
+  document.getElementById('score-counter').textContent = 'Score: '+score;
+}
+
+function showToast(correct, qNum){
+  clearTimeout(toastTimer);
+  const t = document.getElementById('toast');
+  t.className = 'floating-toast ' + (correct ? 'toast-correct' : 'toast-wrong');
+  t.innerHTML = correct ? '✅ Benar! No. '+qNum : '❌ Kurang tepat. No. '+qNum;
+  t.classList.add('show');
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function handleAnswer(qNum, selectedVal){
+  if(answered[qNum]) return;
+  const correct = CORRECT_ANSWERS[qNum];
+  const isCorrect = selectedVal === correct;
+  answered[qNum] = {selected: selectedVal, correct: isCorrect};
+  if(isCorrect) score++;
+
+  const card = document.getElementById('qcard-'+qNum);
+  const opts = card.querySelectorAll('.option');
+  opts.forEach(btn => {
+    btn.classList.add('disabled');
+    const val = btn.getAttribute('data-val');
+    if(val === correct) btn.classList.add('correct-opt');
+    else if(val === selectedVal && !isCorrect) btn.classList.add('wrong-opt');
+  });
+
+  const fb = document.getElementById('fb-'+qNum);
+  fb.classList.add('show', isCorrect ? 'correct-fb' : 'wrong-fb');
+  fb.querySelector('.feedback-title').innerHTML = (isCorrect ? '✅ Benar!' : '❌ Belum Tepat') + ' — Penjelasan';
+
+  card.classList.add('answered', isCorrect ? 'correct-card' : 'wrong-card');
+  showToast(isCorrect, qNum);
+  updateProgress();
+}
+
+// Bind options
+document.querySelectorAll('.options').forEach(optGroup => {
+  const card = optGroup.closest('.question-card');
+  const qNum = parseInt(card.id.replace('qcard-',''));
+  optGroup.querySelectorAll('.option').forEach(btn => {
+    btn.addEventListener('click', ()=> handleAnswer(qNum, btn.getAttribute('data-val')));
+  });
+});
+
+function submitQuiz(){
+  const unanswered = QUESTIONS - Object.keys(answered).length;
+  if(unanswered > 0){
+    const confirmed = confirm('Kamu masih memiliki '+unanswered+' soal yang belum dijawab. Lanjutkan submit?');
+    if(!confirmed) return;
+  }
+  showResult();
+}
+
+function showResult(){
+  const panel = document.getElementById('result-panel');
+  panel.style.display = 'block';
+  const pct = Math.round(score/QUESTIONS*100);
+  document.getElementById('result-score-big').textContent = score+'/'+QUESTIONS;
+
+  let grade, emoji, msg;
+  if(pct >= 90){grade='A — Sangat Baik';emoji='🏆';msg='Luar biasa! Kamu menguasai materi English for Accounting dengan sangat baik. Pertahankan prestasi ini!';}
+  else if(pct >= 80){grade='B — Baik';emoji='🌟';msg='Bagus! Pemahaman kamu sudah solid. Tinjau kembali soal-soal yang belum tepat untuk menyempurnakan pemahamanmu.';}
+  else if(pct >= 70){grade='C — Cukup';emoji='👍';msg='Lumayan! Kamu sudah memahami konsep dasar. Pelajari kembali bagian vocabulary dan inference untuk hasil lebih baik.';}
+  else if(pct >= 60){grade='D — Perlu Perbaikan';emoji='📚';msg='Masih perlu belajar lebih banyak. Fokuskan pada pemahaman konteks kalimat dan istilah akuntansi dalam bahasa Inggris.';}
+  else{grade='E — Kurang';emoji='💪';msg='Jangan menyerah! Mulai dari membaca teks accounting dalam bahasa Inggris setiap hari. Konsistensi adalah kunci!';}
+
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-grade').textContent = grade;
+  document.getElementById('result-message').textContent = msg;
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('btn-submit').disabled = true;
+}
+
+function restartQuiz(){
+  answered = {}; score = 0;
+  document.querySelectorAll('.question-card').forEach(card=>{
+    card.classList.remove('answered','correct-card','wrong-card');
+    card.querySelectorAll('.option').forEach(btn=>{
+      btn.classList.remove('disabled','correct-opt','wrong-opt','selected');
+    });
+    const fb = card.querySelector('.feedback');
+    if(fb) fb.classList.remove('show','correct-fb','wrong-fb');
+  });
+  document.getElementById('result-panel').style.display='none';
+  document.getElementById('btn-submit').disabled = false;
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Scroll top button
+window.addEventListener('scroll', ()=>{
+  const st = document.getElementById('scrollTop');
+  if(window.scrollY > 400) st.classList.add('visible');
+  else st.classList.remove('visible');
+});
+
+updateProgress();
+</script>
+</body>
+</html>
